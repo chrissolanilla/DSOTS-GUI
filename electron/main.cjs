@@ -1,6 +1,8 @@
 const { app, BrowserWindow, ipcMain, shell } = require("electron");
 const path = require("path");
 const express = require("express");
+// file stream instead of just loading the entire file into memory
+const fs = require("fs");
 
 const isDev = !app.isPackaged;
 const PORT = 39170;
@@ -72,7 +74,7 @@ ipcMain.handle("open-external", async (event, url) => {
 
 ipcMain.handle("youtube-upload", async (event, {
   accessToken,
-  fileBuffer,
+  filePath,
   fileName,
   title,
   description,
@@ -83,9 +85,16 @@ ipcMain.handle("youtube-upload", async (event, {
     throw new Error("Missing YouTube access token.");
   }
 
-  if (!fileBuffer) {
-    throw new Error("Missing video file.");
+  if (!filePath) {
+    throw new Error("Missing video file path.");
   }
+
+  if (!fs.existsSync(filePath)) {
+    throw new Error(`Video file does not exist: ${filePath}`);
+  }
+
+  const fileStats = fs.statSync(filePath);
+  const fileSize = fileStats.size;
 
   const metadata = {
     snippet: {
@@ -98,46 +107,51 @@ ipcMain.handle("youtube-upload", async (event, {
     },
   };
 
-  const boundary = "----dsots-boundary-" + Date.now();
-
-  const delimiter = `--${boundary}\r\n`;
-  const closeDelimiter = `\r\n--${boundary}--\r\n`;
-
-  const metadataPart =
-    delimiter +
-    "Content-Type: application/json; charset=UTF-8\r\n\r\n" +
-    JSON.stringify(metadata) +
-    "\r\n";
-
-  const videoPartHeader =
-    delimiter +
-    `Content-Type: ${contentType || "video/mp4"}\r\n\r\n`;
-
-  const body = Buffer.concat([
-    Buffer.from(metadataPart, "utf8"),
-    Buffer.from(videoPartHeader, "utf8"),
-    Buffer.from(fileBuffer),
-    Buffer.from(closeDelimiter, "utf8"),
-  ]);
-
-  const response = await fetch(
-    "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=multipart&part=snippet,status",
+  // Step 1: Start a resumable upload session with YouTube
+  const startResponse = await fetch(
+    "https://www.googleapis.com/upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": `multipart/related; boundary=${boundary}`,
-        "Content-Length": String(body.length),
+        "Content-Type": "application/json; charset=UTF-8",
+        "X-Upload-Content-Type": contentType || "video/mp4",
+        "X-Upload-Content-Length": String(fileSize),
       },
-      body,
+      body: JSON.stringify(metadata),
     }
   );
 
-  const text = await response.text();
+  if (!startResponse.ok) {
+    const text = await startResponse.text();
+    console.error("Failed to start YouTube upload:", startResponse.status, text);
+    throw new Error(`Failed to start YouTube upload ${startResponse.status}: ${text}`);
+  }
 
-  if (!response.ok) {
-    console.error("YouTube upload failed:", response.status, text);
-    throw new Error(`YouTube upload failed ${response.status}: ${text}`);
+  const uploadUrl = startResponse.headers.get("location");
+
+  if (!uploadUrl) {
+    throw new Error("YouTube did not return a resumable upload URL.");
+  }
+
+  // Step 2: Stream the actual video file from disk to YouTube
+  const uploadResponse = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": contentType || "video/mp4",
+      "Content-Length": String(fileSize),
+    },
+    body: fs.createReadStream(filePath),
+
+    // Required by Node/Electron fetch when streaming request bodies
+    duplex: "half",
+  });
+
+  const text = await uploadResponse.text();
+
+  if (!uploadResponse.ok) {
+    console.error("YouTube upload failed:", uploadResponse.status, text);
+    throw new Error(`YouTube upload failed ${uploadResponse.status}: ${text}`);
   }
 
   return JSON.parse(text);
