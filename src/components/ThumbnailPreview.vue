@@ -100,8 +100,11 @@ function nameStyle(name) {
 .thumbnail {
 	position: relative;
 	overflow: hidden;
-	width: min(100%, 1280px);
+	width: 1280px;
 	aspect-ratio: 16 / 9;
+    /*scale it but dont change the dimensions in exported */
+	transform: scale(calc(100cqw / 1280px));
+	transform-origin: top left;
 	margin: 0 auto;
 	/* border-radius: 18px; */
 	background: white;
@@ -163,8 +166,8 @@ function nameStyle(name) {
 }
 
 .ports span {
-	width: clamp(16px, 2.1vw, 30px);
-	height: clamp(16px, 2.1vw, 30px);
+	width: 26.88px;
+	height: 26.88px;
 	border-radius: 999px;
 	border: 4px solid #30c3ee;
 	background: #2b2e3b;
@@ -203,7 +206,7 @@ function nameStyle(name) {
 
 .versus {
     margin-top: 2.5rem;
-	font-size: clamp(5.8rem, 1vw, 9rem);
+	font-size: 5.8rem;
 	font-weight: bold;
 	line-height: 0.8;
 	color: #ff7ac6;
@@ -213,7 +216,7 @@ function nameStyle(name) {
 .event-name {
 	color: gold;
 	margin: 0;
-	font-size: clamp(2.8rem, 4.4vw, 5.2rem);
+	font-size: 3.52rem;
 	line-height: 0.85;
 	text-transform: uppercase;
 	-webkit-text-stroke: 2px black;
@@ -228,40 +231,15 @@ function nameStyle(name) {
 
 .set-name {
 	margin: 0;
-	font-size: clamp(2.8rem, 4.5vw, 5.2rem);
+	font-size: 3.6rem;
 	line-height: 0.9;
 }
 
 .game-name {
 	margin: 0.35rem 0 0;
-	font-size: clamp(2.4rem, 3.4vw, 3.7rem);
+	font-size: 2.72rem;
 	line-height: 0.95;
 	-webkit-text-stroke: 2px black;
 }
 
-@media (max-width: 760px) {
-	.thumbnail {
-		border-radius: 12px;
-	}
-
-	.player-info {
-		top: 8%;
-		width: 37%;
-	}
-
-	.player-info h2 {
-		font-size: clamp(1.35rem, calc(26rem / var(--name-length)), 3rem);
-		-webkit-text-stroke: 1px black;
-	}
-
-	.character {
-		top: 34%;
-		width: 38%;
-		height: 48%;
-	}
-
-	.center-info {
-		inset: 10% 28% 8%;
-	}
-}
 </style>

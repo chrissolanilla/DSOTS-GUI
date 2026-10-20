@@ -110,10 +110,11 @@ async function downloadThumbnail() {
 	if (!thumbnailRef.value) return
 
 	try {
-		const dataUrl = await toPng(thumbnailRef.value, {
+		const dataUrl = await toPng(thumbnailRef.value.firstElementChild, {
 			cacheBust: true,
 			pixelRatio: 2,
 			backgroundColor: '#ffffff',
+			style: { transform: 'none' },
 		})
 
 		const link = document.createElement('a')
@@ -261,6 +262,9 @@ async function downloadThumbnail() {
 
 .export-target {
 	width: min(100%, 1280px);
+	aspect-ratio: 16 / 9;
+	container-type: inline-size;
+	overflow: hidden;
 	margin: 0 auto;
 }
 </style>
