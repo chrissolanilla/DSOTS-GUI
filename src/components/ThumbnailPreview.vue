@@ -103,8 +103,14 @@ function nameStyle(name) {
 	width: 1280px;
 	aspect-ratio: 16 / 9;
     /*scale it but dont change the dimensions in exported */
-	transform: scale(calc(100cqw / 1280px));
+	transform: scale(var(--preview-scale, 1));
 	transform-origin: top left;
+    /* make the display a grid to keep the text on the same level for both players */
+	display: grid;
+	grid-template-columns: 2% 36% 24% 36% 2%;
+	grid-template-rows: 7% max-content 0.45rem max-content 1fr;
+	align-items: baseline;
+	justify-items: center;
 	margin: 0 auto;
 	/* border-radius: 18px; */
 	background: white;
@@ -122,7 +128,6 @@ function nameStyle(name) {
 	opacity: 0.78;
 }
 
-.player-info,
 .center-info,
 .character {
 	position: absolute;
@@ -130,25 +135,22 @@ function nameStyle(name) {
 }
 
 .player-info {
-	top: 7%;
-	width: 36%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 0.45rem;
+	display: contents;
 	color: #bf95f9;
 	-webkit-text-stroke: 2px black;
 }
 
-.player-info-left {
-	left: 2%;
+.player-info-left > * {
+	grid-column: 2;
 }
 
-.player-info-right {
-	right: 2%;
+.player-info-right > * {
+	grid-column: 4;
 }
 
 .player-info h2 {
+	grid-row: 2;
+	z-index: 1;
 	margin: 0;
 	max-width: 100%;
 	font-size: clamp(2.05rem, calc(38rem / var(--name-length)), 5.25rem);
@@ -161,6 +163,8 @@ function nameStyle(name) {
 }
 
 .ports {
+	grid-row: 4;
+	z-index: 1;
 	display: flex;
 	gap: 0.4rem;
 }

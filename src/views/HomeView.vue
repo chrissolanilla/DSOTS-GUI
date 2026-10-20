@@ -25,7 +25,7 @@ function uploadVideo() {
 // end of upload video function
 
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { toPng } from 'html-to-image'
 import Navbar from '../components/Navbar.vue'
 import PlayerForm from '../components/PlayerForm.vue'
@@ -34,6 +34,17 @@ import ThumbnailPreview from '../components/ThumbnailPreview.vue'
 const publicPath = import.meta.env.BASE_URL
 
 const thumbnailRef = ref(null)
+
+let previewObserver
+
+onMounted(() => {
+	previewObserver = new ResizeObserver(([{ target, contentRect }]) => {
+		target.style.setProperty('--preview-scale', contentRect.width / 1280)
+	})
+	previewObserver.observe(thumbnailRef.value)
+})
+
+onBeforeUnmount(() => previewObserver?.disconnect())
 
 const characters = [
 	{ label: 'Bowser', value: 'bowser', filePrefix: 'bowser', colors: 4 },
@@ -263,7 +274,6 @@ async function downloadThumbnail() {
 .export-target {
 	width: min(100%, 1280px);
 	aspect-ratio: 16 / 9;
-	container-type: inline-size;
 	overflow: hidden;
 	margin: 0 auto;
 }
