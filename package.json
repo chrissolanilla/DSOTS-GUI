@@ -14,9 +14,13 @@
     "electron:pack": "npm run build && electron-builder --dir",
     "electron:linux": "npm run build && electron-builder --linux AppImage",
     "electron:win": "npm run build && electron-builder --win portable",
-    "electron:win-installer": "npm run build && electron-builder --win nsis"
+    "electron:win-installer": "npm run build && electron-builder --win nsis",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "dependencies": {
+    "electron-squirrel-startup": "^1.0.1",
     "express": "^5.2.1",
     "get-port": "^7.2.0",
     "html-to-image": "^1.11.13",
@@ -24,10 +28,18 @@
     "vue-router": "^5.1.0"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.11.2",
+    "@electron-forge/maker-deb": "^7.11.2",
+    "@electron-forge/maker-rpm": "^7.11.2",
+    "@electron-forge/maker-squirrel": "^7.11.2",
+    "@electron-forge/maker-zip": "^7.11.2",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
+    "@electron-forge/plugin-fuses": "^7.11.2",
+    "@electron/fuses": "^1.8.0",
     "@vitejs/plugin-vue": "^6.0.6",
     "concurrently": "^10.0.3",
     "electron": "^42.4.0",
-    "electron-builder": "^26.15.2",
+    "electron-builder": "^26.15.3",
     "sass-embedded": "^1.100.0",
     "vite": "^8.0.12",
     "wait-on": "^9.0.10"

@@ -165,13 +165,17 @@ async function uploadToYouTube() {
   uploadedVideoId.value = "";
 
   try {
-    const arrayBuffer = await props.videoFile.arrayBuffer();
+    const filePath = window.electronAPI.getPathForFile(props.videoFile);
+
+    if (!filePath) {
+      throw new Error("Could not get video file path.");
+    }
 
     videoStatus.value = "Uploading video to YouTube...";
 
     const result = await window.electronAPI.uploadToYouTube({
       accessToken: props.accessToken,
-      fileBuffer: Array.from(new Uint8Array(arrayBuffer)),
+      filePath,
       fileName: props.videoFile.name,
       title: title.value,
       description: description.value,
