@@ -108,8 +108,8 @@ function nameStyle(name) {
     /* make the display a grid to keep the text on the same level for both players */
 	display: grid;
 	grid-template-columns: 2% 36% 24% 36% 2%;
-	grid-template-rows: 7% max-content 0.45rem max-content 1fr;
-	align-items: baseline;
+	grid-template-rows: 7% max-content 0.45rem max-content 3rem minmax(0, 1fr);
+	align-items: last baseline;
 	justify-items: center;
 	margin: 0 auto;
 	/* border-radius: 18px; */
@@ -128,8 +128,7 @@ function nameStyle(name) {
 	opacity: 0.78;
 }
 
-.center-info,
-.character {
+.center-info {
 	position: absolute;
 	z-index: 1;
 }
@@ -154,12 +153,12 @@ function nameStyle(name) {
 	margin: 0;
 	max-width: 100%;
 	font-size: clamp(2.05rem, calc(38rem / var(--name-length)), 5.25rem);
-	line-height: 0.9;
+	line-height: 1.1;
 	letter-spacing: 0.02em;
 	text-align: center;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: clip;
+	white-space: normal;
+	overflow-wrap: anywhere;
+	text-wrap: balance;
 }
 
 .ports {
@@ -182,19 +181,25 @@ function nameStyle(name) {
 }
 
 .character {
-	top: 27%;
+	grid-row: 6;
+	grid-column: 1 / -1;
+	align-self: start;
+	z-index: 1;
 	width: 34%;
-	height: 54%;
+	height: 100%;
+	max-height: 388.8px;
 	object-fit: contain;
 	filter: drop-shadow(0 16px 10px rgba(0, 0, 0, 0.35));
 }
 
 .character-left {
-	left: 2%;
+	justify-self: start;
+	margin-left: 2%;
 }
 
 .character-right {
-	right: 2%;
+	justify-self: end;
+	margin-right: 2%;
 }
 
 .center-info {

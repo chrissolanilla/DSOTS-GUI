@@ -13,7 +13,7 @@
 <!-- </template> -->
 <script setup>
 
-// add router for upload video 
+// add router for upload video
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -126,6 +126,8 @@ async function downloadThumbnail() {
 			pixelRatio: 2,
 			backgroundColor: '#ffffff',
 			style: { transform: 'none' },
+			//copy the full font last to preserve the preview's exact text wrapping
+			includeStyleProperties: [...getComputedStyle(document.documentElement), 'font'],
 		})
 
 		const link = document.createElement('a')
